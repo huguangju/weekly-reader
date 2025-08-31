@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { SearchButton } from '@/components/search-button'
 
 export const metadata: Metadata = {
   title: '科技爱好者周刊 - 更好的阅读体验',
@@ -39,6 +40,11 @@ export default function RootLayout({
                 >
                   所有期刊
                 </a>
+              </div>
+              
+              {/* 搜索按钮 */}
+              <div className="hidden md:flex items-center">
+                <SearchButton />
               </div>
               
               {/* 移动端菜单按钮 */}
