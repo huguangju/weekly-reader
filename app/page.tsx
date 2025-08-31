@@ -20,7 +20,7 @@ export default async function HomePage() {
           <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             科技爱好者周刊
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-gray-400 mx-auto">
             记录每周值得分享的科技内容，周五发布。这里提供更友好的阅读界面和分类浏览体验。
           </p>
         </div>
