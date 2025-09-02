@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getIssueByNumber } from '@/lib/data'
 import { MarkdownRenderer } from '@/components/markdown-renderer'
+import { SummaryRenderer } from '@/components/summary-renderer'
 import { TOC } from '@/components/toc'
 import Link from 'next/link'
 
@@ -82,9 +83,9 @@ export default async function IssuePage({ params }: IssuePageProps) {
                 </h1>
                 
                 {/* 描述 */}
-                <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
-                  {issue.description}
-                </p>
+                <div className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+                  <SummaryRenderer content={issue.description} />
+                </div>
                 
                 {/* 标签 */}
                 {issue.tags.length > 0 && (

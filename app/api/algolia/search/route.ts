@@ -42,7 +42,8 @@ export async function GET(request: NextRequest) {
       }]
     })
 
-    const { hits, nbHits, nbPages, page: currentPage } = results[0]
+    const result = results[0] as any
+    const { hits, nbHits, nbPages, page: currentPage } = result
 
     // 处理搜索结果
     const searchResults = hits.map((hit: any) => ({

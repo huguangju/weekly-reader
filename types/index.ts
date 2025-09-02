@@ -5,6 +5,7 @@ export interface Issue {
   title: string
   publishDate: Date
   description: string
+  coverImage?: string
   tags: string[]
   content: string
   fileName: string

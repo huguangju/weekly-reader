@@ -147,9 +147,9 @@ export class ContentParser {
   }
 
   /**
-   * 解析单个期刊文件，提取标题、日期、描述、标签等
+   * 解析单个期刊文件
    */
-  async parseIssueFile(filePath: string): Promise<Issue | null> {
+  private async parseIssueFile(filePath: string): Promise<Issue | null> {
     try {
       const content = fs.readFileSync(filePath, 'utf-8')
       const fileName = path.basename(filePath)
@@ -157,29 +157,29 @@ export class ContentParser {
       // 提取期数
       const issueNumberMatch = fileName.match(/issue-(\d+)\.md/)
       if (!issueNumberMatch) {
-        console.warn(`文件名格式不正确: ${fileName}`)
+        console.warn(`无法从文件名提取期数: ${fileName}`)
         return null
       }
-      
       const issueNumber = parseInt(issueNumberMatch[1])
       
-      // 解析 Markdown 内容
-      const { data, content: markdownContent } = matter(content)
-      
       // 提取标题
-      const title = this.extractTitle(markdownContent, fileName)
+      const title = this.extractTitle(content, fileName)
       
       // 提取发布日期
-      const publishDate = this.extractPublishDate(markdownContent, fileName)
+      const publishDate = this.extractPublishDate(content, fileName)
       
-      // 生成简介摘要
-      const description = this.generateDescription(markdownContent)
+      // 提取描述
+      const description = this.generateDescription(content)
+      
+      // 提取封面图
+      const coverImage = this.extractCoverImage(content) || undefined
       
       // 提取标签
-      const tags = this.extractTags(markdownContent)
+      const tags = this.extractTags(content)
       
-      // 提取年份和月份
-      const { year, month } = this.extractYearMonth(publishDate)
+      // 提取年份和月份（简化处理）
+      const year = publishDate.getFullYear()
+      const month = publishDate.getMonth() + 1
       
       const issue: Issue = {
         id: `issue-${issueNumber}`,
@@ -187,8 +187,9 @@ export class ContentParser {
         title,
         publishDate,
         description,
+        coverImage,
         tags,
-        content: markdownContent,
+        content,
         fileName,
         year,
         month,
@@ -197,6 +198,7 @@ export class ContentParser {
       
       // 验证数据
       const validation = DataValidator.validateIssue(issue)
+      
       if (!validation.isValid) {
         console.warn(`期刊数据验证失败 ${fileName}:`, validation.errors)
         return null
@@ -239,10 +241,69 @@ export class ContentParser {
 
   /**
    * 生成简介摘要，去除 Markdown 标记
+   * 只提取封面图后的内容作为描述
    */
   private generateDescription(content: string, maxLength: number = 200): string {
+    // 找到封面图的位置
+    const coverImageIndex = content.indexOf('## 封面图')
+    if (coverImageIndex === -1) {
+      // 如果没有找到封面图，使用原来的逻辑
+      return this.generateDescriptionFromFullContent(content, maxLength)
+    }
+    
+    // 提取封面图后的内容
+    const contentAfterCover = content.substring(coverImageIndex)
+    
+    // 找到封面图部分的结束位置（下一个二级标题）
+    const lines = contentAfterCover.split('\n')
+    let endIndex = contentAfterCover.length
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim()
+      // 跳过封面图标题行和图片行
+      if (line === '## 封面图' || line.startsWith('![') || line.startsWith('![](https://')) {
+        continue
+      }
+      // 如果遇到下一个二级标题，停止提取
+      if (line.startsWith('## ') && line !== '## 封面图') {
+        endIndex = contentAfterCover.indexOf(line)
+        break
+      }
+    }
+    
+    // 提取封面图描述部分
+    const coverDescription = contentAfterCover.substring(0, endIndex)
+    
+    // 去除 Markdown 标记
+    let cleanContent = coverDescription
+      .replace(/^#+\s*封面图\s*$/gm, '') // 去除封面图标题
+      .replace(/^#+\s*/gm, '') // 去除标题标记（#、##、###等）
+      .replace(/!\[([^\]]*)\]\([^)]*\)/g, '') // 去除图片
+      .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1') // 将链接转换为纯文本
+      .replace(/[*_`~]/g, '') // 去除其他 Markdown 标记
+      .replace(/\n+/g, ' ') // 将换行转换为空格
+      .trim()
+    
+    // 如果封面图描述为空，则使用第一个正文段落
+    if (!cleanContent) {
+      return this.generateDescriptionFromFullContent(content, maxLength)
+    }
+    
+    // 截取指定长度
+    if (cleanContent.length > maxLength) {
+      cleanContent = cleanContent.substring(0, maxLength) + '...'
+    }
+    
+    return cleanContent
+  }
+
+  /**
+   * 从完整内容生成描述（原来的逻辑）
+   */
+  private generateDescriptionFromFullContent(content: string, maxLength: number = 200): string {
     // 去除 Markdown 标记
     let cleanContent = content
+      .replace(/^#+\s*/gm, '') // 去除标题标记（#、##、###等）
       .replace(/!\[([^\]]*)\]\([^)]*\)/g, '') // 去除图片
       .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1') // 将链接转换为纯文本
       .replace(/[*_`~]/g, '') // 去除其他 Markdown 标记
@@ -258,25 +319,127 @@ export class ContentParser {
   }
 
   /**
-   * 提取发布日期，支持多种日期格式
+   * 提取封面图，从 Markdown 内容中提取
    */
-  private extractPublishDate(content: string, fileName: string): Date {
-    // 尝试从文件名提取日期（issue-362.md -> 假设是2025年）
-    const issueNumberMatch = fileName.match(/issue-(\d+)\.md/)
-    if (issueNumberMatch) {
-      const issueNumber = parseInt(issueNumberMatch[1])
-      // 根据期数估算年份（这是一个简化的逻辑，实际应该从内容中提取）
-      if (issueNumber >= 300) {
-        return new Date(2025, 0, 1) // 2025年1月1日
-      } else if (issueNumber >= 200) {
-        return new Date(2024, 0, 1) // 2024年1月1日
-      } else {
-        return new Date(2023, 0, 1) // 2023年1月1日
+  private extractCoverImage(content: string): string | null {
+    const lines = content.split('\n')
+    let foundCoverSection = false
+    
+    for (const line of lines) {
+      // 检查是否进入封面图部分
+      if (line.trim() === '## 封面图' || line.trim().includes('封面图')) {
+        foundCoverSection = true
+        continue
+      }
+      
+      // 在封面图部分查找图片
+      if (foundCoverSection) {
+        // 匹配各种图片格式：![alt](url) 或 ![](url)
+        const match = line.match(/^!\[([^\]]*)\]\(([^)]+)\)/)
+        if (match) {
+          return match[2]
+        }
+        
+        // 如果遇到下一个二级标题，停止查找
+        if (line.trim().startsWith('## ') && !line.trim().includes('封面图')) {
+          break
+        }
       }
     }
     
-    // 如果无法从文件名提取，返回当前日期
-    return new Date()
+    // 如果没有找到封面图部分，查找第一个图片
+    if (!foundCoverSection) {
+      for (const line of lines) {
+        const match = line.match(/^!\[([^\]]*)\]\(([^)]+)\)/)
+        if (match) {
+          return match[2]
+        }
+      }
+    }
+    
+    return null
+  }
+
+  /**
+   * 提取发布日期，从 README.md 文件中获取准确的日期信息
+   */
+  private extractPublishDate(content: string, fileName: string): Date {
+    const issueNumberMatch = fileName.match(/issue-(\d+)\.md/)
+    if (!issueNumberMatch) {
+      return new Date()
+    }
+    
+    const issueNumber = parseInt(issueNumberMatch[1])
+    const dateInfo = this.getIssueDateFromReadme(issueNumber)
+    
+    if (dateInfo) {
+      return new Date(dateInfo.year, dateInfo.month - 1, dateInfo.day)
+    }
+    
+    // 如果无法从 README.md 获取，使用估算逻辑
+    if (issueNumber >= 300) {
+      return new Date(2025, 0, 1)
+    } else if (issueNumber >= 200) {
+      return new Date(2024, 0, 1)
+    } else {
+      return new Date(2023, 0, 1)
+    }
+  }
+
+  /**
+   * 从 README.md 文件中获取指定期数的日期信息
+   */
+  private getIssueDateFromReadme(issueNumber: number): { year: number; month: number; day: number } | null {
+    try {
+      const readmePath = path.join(process.cwd(), 'README.md')
+      const content = fs.readFileSync(readmePath, 'utf-8')
+      const lines = content.split('\n')
+      
+      let currentYear: number | null = null
+      let currentMonth: number | null = null
+      let currentMonthName: string | null = null
+      
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim()
+        
+        // 匹配年份标题 (## 2025)
+        const yearMatch = line.match(/^## (\d{4})$/)
+        if (yearMatch) {
+          currentYear = parseInt(yearMatch[1])
+          currentMonth = null
+          currentMonthName = null
+          continue
+        }
+        
+        // 匹配月份标题 (**八月**)
+        const monthMatch = line.match(/^\*\*([^星]+)\*\*$/)
+        if (monthMatch && currentYear) {
+          currentMonthName = monthMatch[1]
+          currentMonth = this.parseMonthNumber(currentMonthName)
+          continue
+        }
+        
+        // 匹配期数 (- 第 362 期：[标题](链接))
+        const issueMatch = line.match(/^- 第 (\d+) 期：/)
+        if (issueMatch && currentYear && currentMonth) {
+          const lineIssueNumber = parseInt(issueMatch[1])
+          if (lineIssueNumber === issueNumber) {
+            // 找到目标期数，返回日期信息
+            // 由于 README.md 中没有具体日期，我们使用月份的第一天
+            return {
+              year: currentYear,
+              month: currentMonth,
+              day: 1
+            }
+          }
+        }
+      }
+      
+      return null
+    } catch (error) {
+      console.error('从 README.md 获取日期信息失败:', error)
+      return null
+    }
   }
 
   /**

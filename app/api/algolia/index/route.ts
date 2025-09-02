@@ -28,21 +28,24 @@ export async function POST(request: NextRequest) {
       month: issue.month,
       issueNumber: issue.issueNumber,
       fileName: issue.fileName,
-      content: issue.content,
+      // 限制内容长度，避免超过 Algolia 的 10KB 限制
+      content: issue.content.length > 8000 ? issue.content.substring(0, 8000) + '...' : issue.content,
       publishDate: issue.publishDate.toISOString()
     }))
 
     // 批量索引数据 - 使用 v5 API
-    const { taskID } = await adminClient.saveObject({
+    const response = await adminClient.saveObjects({
       indexName: ALGOLIA_CONFIG.indexName,
-      body: algoliaObjects
+      objects: algoliaObjects
     })
 
     // 等待索引完成
-    await adminClient.waitForTask({
-      indexName: ALGOLIA_CONFIG.indexName,
-      taskID
-    })
+    if (Array.isArray(response) && response.length > 0 && response[0].taskID) {
+      await adminClient.waitForTask({
+        indexName: ALGOLIA_CONFIG.indexName,
+        taskID: response[0].taskID
+      })
+    }
 
     const result = { objectIDs: algoliaObjects.map(obj => obj.objectID) }
 

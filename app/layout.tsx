@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { SearchButton } from '@/components/search-button'
+import { SearchBar } from '@/components/search-bar'
+import { MobileMenu } from '@/components/mobile-menu'
 
 export const metadata: Metadata = {
   title: '科技爱好者周刊 - 更好的阅读体验',
@@ -42,18 +43,14 @@ export default function RootLayout({
                 </a>
               </div>
               
-              {/* 搜索按钮 */}
+              {/* 搜索框 */}
               <div className="hidden md:flex items-center">
-                <SearchButton />
+                <SearchBar />
               </div>
               
-              {/* 移动端菜单按钮 */}
+              {/* 移动端菜单 */}
               <div className="md:hidden">
-                <button className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100">
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                </button>
+                <MobileMenu />
               </div>
             </div>
           </div>

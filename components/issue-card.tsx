@@ -2,6 +2,7 @@
 
 import { Issue } from '@/types'
 import Link from 'next/link'
+import { SummaryRenderer } from './summary-renderer'
 
 interface IssueCardProps {
   issue: Issue
@@ -13,7 +14,6 @@ export function IssueCard({ issue, className = '' }: IssueCardProps) {
     return new Intl.DateTimeFormat('zh-CN', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
     }).format(date)
   }
 
@@ -26,9 +26,6 @@ export function IssueCard({ issue, className = '' }: IssueCardProps) {
             <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
               第 {issue.issueNumber} 期
             </span>
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              {formatDate(issue.publishDate)}
-            </span>
           </div>
           
           {/* 标题 */}
@@ -36,27 +33,46 @@ export function IssueCard({ issue, className = '' }: IssueCardProps) {
             {issue.title}
           </h3>
           
-          {/* 描述 */}
-          <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-3 leading-relaxed">
-            {issue.description}
-          </p>
+          {/* 描述和封面图 */}
+          <div className="flex gap-4">
+            {/* 封面图 */}
+            {issue.coverImage && (
+              <div className="flex-shrink-0">
+                <img 
+                  src={issue.coverImage} 
+                  alt={`第 ${issue.issueNumber} 期封面图`}
+                  className="w-24 h-24 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
+                />
+              </div>
+            )}
+            
+            {/* 描述 */}
+            <div className="flex-1 min-w-0">
+              <div className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                <SummaryRenderer 
+                  content={issue.description} 
+                  className="text-sm line-clamp-4"
+                  maxLength={200}
+                />
+              </div>
+            </div>
+          </div>
           
           {/* 标签 */}
           {issue.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 pt-2">
-              {issue.tags.slice(0, 3).map((tag, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
-                >
-                  {tag}
-                </span>
-              ))}
-              {issue.tags.length > 3 && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                  +{issue.tags.length - 3}
-                </span>
-              )}
+            <div className="relative pt-2">
+              <div className="flex gap-2 overflow-x-auto overflow-y-hidden scrollbar-hide">
+                {issue.tags.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              {/* 渐变蒙层 */}
+              <div className="absolute right-0 top-2 bottom-0 w-8 bg-gradient-to-l from-white dark:from-gray-800 to-transparent pointer-events-none"></div>
             </div>
           )}
         </div>

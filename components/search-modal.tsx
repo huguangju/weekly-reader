@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
-import { Search, X, FileText, Tag, Calendar } from 'lucide-react'
+import { Search, X, FileText, Tag, Calendar, ArrowUp, ArrowDown, CornerDownLeft } from 'lucide-react'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Issue } from '@/types'
@@ -34,6 +34,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const [results, setResults] = useState<SearchResult[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [allIssues, setAllIssues] = useState<Issue[]>([])
+  const [selectedIndex, setSelectedIndex] = useState(-1)
   const inputRef = useRef<HTMLInputElement>(null)
 
   // 获取所有期刊数据
@@ -76,9 +77,11 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
       
       if (data.success) {
         setResults(data.results)
+        setSelectedIndex(-1) // 重置选中索引
       } else {
         console.error('搜索失败:', data.error)
         setResults([])
+        setSelectedIndex(-1)
       }
     } catch (error) {
       console.error('搜索出错:', error)
@@ -113,6 +116,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
       .slice(0, 10)
 
     setResults(searchResults)
+    setSelectedIndex(-1) // 重置选中索引
   }
 
   // 高亮匹配文本
@@ -127,6 +131,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setQuery(value)
+    setSelectedIndex(-1) // 重置选中索引
     performSearch(value)
   }
 
@@ -142,8 +147,47 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
       onClose()
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      if (results.length > 0) {
+        setSelectedIndex(prev => 
+          prev < results.length - 1 ? prev + 1 : 0
+        )
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      if (results.length > 0) {
+        setSelectedIndex(prev => 
+          prev > 0 ? prev - 1 : results.length - 1
+        )
+      }
+    } else if (e.key === 'Enter') {
+      e.preventDefault()
+      if (selectedIndex >= 0 && selectedIndex < results.length) {
+        handleResultClick(results[selectedIndex])
+      }
     }
   }
+
+  // 监听全局 Command + K 快捷键
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // 检查是否是 Command + K (Mac) 或 Ctrl + K (Windows/Linux)
+      if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+        event.preventDefault()
+        if (isOpen) {
+          onClose()
+        } else {
+          // 如果模态框未打开，这里不需要处理，因为全局监听器会处理
+        }
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown)
+      return () => document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isOpen, onClose])
 
   // 弹窗打开时聚焦输入框
   useEffect(() => {
@@ -163,7 +207,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
       />
       
       {/* 搜索弹窗 */}
-      <div className="relative w-full max-w-2xl mx-4 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700">
+      <div className="relative w-full max-w-2xl mx-4 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
         {/* 弹窗头部 */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-3">
@@ -204,10 +248,14 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
             </div>
           ) : results.length > 0 ? (
             <div className="divide-y divide-gray-200 dark:divide-gray-700">
-              {results.map((result) => (
+              {results.map((result, index) => (
                 <div
                   key={result.id}
-                  className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                  className={`p-4 cursor-pointer transition-colors ${
+                    selectedIndex === index
+                      ? 'bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500'
+                      : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
                   onClick={() => handleResultClick(result)}
                 >
                   <div className="flex items-start space-x-3">
@@ -271,7 +319,33 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
         {/* 弹窗底部 */}
         <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
           <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-            <span>按 ESC 键关闭</span>
+            <div className="flex items-center space-x-4">
+              {results.length > 0 && (
+                <div className="hidden md:flex items-center space-x-2">
+                  <div className="flex items-center space-x-1">
+                    <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs font-mono rounded border border-gray-200 dark:border-gray-600">
+                      ↑
+                    </kbd>
+                    <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs font-mono rounded border border-gray-200 dark:border-gray-600">
+                      ↓
+                    </kbd>
+                    <span className="text-xs">切换</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs font-mono rounded border border-gray-200 dark:border-gray-600">
+                      ↵
+                    </kbd>
+                    <span className="text-xs">选择</span>
+                  </div>
+                </div>
+              )}
+              <div className="flex items-center space-x-1">
+                <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs font-mono rounded border border-gray-200 dark:border-gray-600">
+                  ESC
+                </kbd>
+                <span className="text-xs">关闭</span>
+              </div>
+            </div>
             {results.length > 0 && (
               <span>找到 {results.length} 个结果</span>
             )}

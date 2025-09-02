@@ -1,5 +1,8 @@
 import { getTimeIndex, getAllIssues } from '@/lib/data'
 import { IssueCard } from '@/components/issue-card'
+import { FloatingNav } from '@/components/floating-nav'
+import { MobileNav } from '@/components/mobile-nav'
+
 import { Issue } from '@/types'
 
 export default async function HomePage() {
@@ -14,6 +17,12 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* 悬浮导航 - 桌面端 */}
+      <FloatingNav timeIndex={timeIndex} />
+      
+      {/* 移动端导航 */}
+      <MobileNav timeIndex={timeIndex} />
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* 页面标题 */}
         <div className="text-center mb-12">
@@ -30,7 +39,10 @@ export default async function HomePage() {
           {timeIndex.map((yearData) => (
             <div key={yearData.year} className="space-y-6">
               {/* 年份标题 */}
-              <div className="border-b border-gray-200 dark:border-gray-700 pb-2">
+              <div 
+                data-year={yearData.year}
+                className="border-b border-gray-200 dark:border-gray-700 pb-2"
+              >
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {yearData.year}
                 </h2>
@@ -38,7 +50,11 @@ export default async function HomePage() {
 
               {/* 月份分组 */}
               {yearData.months.map((monthData) => (
-                <div key={`${yearData.year}-${monthData.month}`} className="space-y-4">
+                <div 
+                  key={`${yearData.year}-${monthData.month}`} 
+                  data-month={`${yearData.year}-${monthData.month}`}
+                  className="space-y-4"
+                >
                   {/* 月份标题 */}
                   <div className="flex items-center space-x-3">
                     <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
