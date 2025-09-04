@@ -3,6 +3,7 @@ export interface Issue {
   id: string
   filePath: string
   title: string
+  optimizedTitle: string
   publishDate: Date
   description: string
   coverImage?: string

@@ -185,6 +185,7 @@ export class ContentParser {
         id: `issue-${issueNumber}`,
         filePath,
         title,
+        optimizedTitle: this.optimizeTitle(title),
         publishDate,
         description,
         coverImage,
@@ -440,6 +441,22 @@ export class ContentParser {
       console.error('从 README.md 获取日期信息失败:', error)
       return null
     }
+  }
+
+  /**
+   * 优化标题显示格式
+   */
+  private optimizeTitle(title: string): string {
+    // 匹配格式：科技爱好者周刊（第 XXX 期）：实际标题
+    const match = title.match(/^科技爱好者周刊（第\s*(\d+)\s*期）：(.+)$/)
+    if (match) {
+      const issueNumber = match[1]
+      const actualTitle = match[2].trim()
+      return `${actualTitle}（${issueNumber}期）`
+    }
+    
+    // 如果格式不匹配，返回原标题
+    return title
   }
 
   /**

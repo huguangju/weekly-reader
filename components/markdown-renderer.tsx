@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
@@ -7,10 +8,12 @@ import rehypeSlug from 'rehype-slug'
 
 interface MarkdownRendererProps {
   content: string
+  optimizedTitle?: string
   className?: string
 }
 
-export function MarkdownRenderer({ content, className = '' }: MarkdownRendererProps) {
+export function MarkdownRenderer({ content, optimizedTitle, className = '' }: MarkdownRendererProps) {
+
   return (
     <div className={`max-w-none ${className}`}>
       <ReactMarkdown
@@ -21,11 +24,15 @@ export function MarkdownRenderer({ content, className = '' }: MarkdownRendererPr
         ]}
         components={{
           // 自定义标题组件，添加ID用于TOC导航
-          h1: ({ children, ...props }) => (
-            <h1 id={props.id} className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6 pt-8 -mt-8" {...props}>
-              {children}
-            </h1>
-          ),
+          h1: ({ children, ...props }) => {
+            const displayTitle = optimizedTitle || React.Children.toArray(children).join('')
+
+            return (
+              <h1 id={props.id} className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6 pt-8 -mt-8" {...props}>
+                {displayTitle}
+              </h1>
+            )
+          },
           h2: ({ children, ...props }) => (
             <h2 id={props.id} className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4 pt-8 -mt-8" {...props}>
               {children}

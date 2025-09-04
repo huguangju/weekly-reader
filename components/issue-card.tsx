@@ -30,7 +30,7 @@ export function IssueCard({ issue, className = '' }: IssueCardProps) {
           
           {/* 标题 */}
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 line-clamp-2">
-            {issue.title}
+            {issue.optimizedTitle}
           </h3>
           
           {/* 描述和封面图 */}
