@@ -15,6 +15,22 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN">
+      <head>
+        {/* 预连接字体CDN  */}
+        <link rel="preconnect" href="https://chinese-fonts-cdn.deno.dev" />
+        <link rel="dns-prefetch" href="https://chinese-fonts-cdn.deno.dev" />
+        
+        {/* 预加载字体文件 */}
+        <link 
+          rel="preload" 
+          href="https://chinese-fonts-cdn.deno.dev/packages/lxgwwenkai/dist/lxgwwenkai-light/result.css" 
+          as="style"
+        />
+        <link 
+          rel="stylesheet" 
+          href="https://chinese-fonts-cdn.deno.dev/packages/lxgwwenkai/dist/lxgwwenkai-light/result.css" 
+        />
+      </head>
       <body className="antialiased font-wenkai">
         {/* 导航栏 */}
         <nav className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">

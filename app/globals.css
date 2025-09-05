@@ -1,11 +1,9 @@
 @import "tailwindcss";
 
-/* 霞鹜文楷字体 */
-@import url('https://unpkg.com/@chinese-fonts/lxgwwenkai@3.0.0/dist/lxgwwenkai-light/result.css');
-
 @layer base {
   .font-wenkai {
-    font-family: "LXGW WenKai Light", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif !important;
+    font-family: "LXGW WenKai Light", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif !important;
+    font-display: swap;
   }
   
   :root {
