@@ -74,7 +74,7 @@ export default async function IssuePage({ params }: IssuePageProps) {
           <div className="lg:col-span-1">
             <div className="sticky top-8 space-y-6">
               {/* TOC 导航 */}
-              <TOC optimizedTitle={issue.optimizedTitle} />
+              <TOC />
 
               {/* 标签 */}
               {issue.tags.length > 0 && (

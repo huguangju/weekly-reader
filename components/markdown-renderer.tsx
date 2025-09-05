@@ -15,7 +15,7 @@ interface MarkdownRendererProps {
 export function MarkdownRenderer({ content, optimizedTitle, className = '' }: MarkdownRendererProps) {
 
   return (
-    <div className={`max-w-none ${className}`}>
+    <div className={`max-w-none font-wenkai ${className}`}>
       <ReactMarkdown
         rehypePlugins={[
           rehypeSlug,
