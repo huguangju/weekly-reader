@@ -33,25 +33,35 @@ jobs:
         
         # 创建临时目录
         TEMP_DIR=$(mktemp -d)
-        cd "$TEMP_DIR"
+        echo "📁 临时目录: $TEMP_DIR"
         
-        # 克隆源仓库
+        # 克隆源仓库到临时目录
         echo "📥 克隆源仓库..."
-        git clone --depth 1 https://github.com/${{ env.SOURCE_REPO }}.git source
+        git clone --depth 1 https://github.com/${{ env.SOURCE_REPO }}.git "$TEMP_DIR/source"
         
+        # 切换到工作目录
         cd "$GITHUB_WORKSPACE"
         
         # 同步 docs 目录
-        if [ -d "source/docs" ]; then
+        if [ -d "$TEMP_DIR/source/docs" ]; then
           echo "📁 同步 docs 目录..."
-          rsync -av --delete source/docs/ docs/
+          rsync -av --delete "$TEMP_DIR/source/docs/" docs/
+        else
+          echo "⚠️ 源仓库中没有找到 docs 目录"
         fi
         
         # 同步 README.md
-        if [ -f "source/README.md" ]; then
+        if [ -f "$TEMP_DIR/source/README.md" ]; then
           echo "📄 同步 README.md..."
-          cp source/README.md README.md
+          cp "$TEMP_DIR/source/README.md" README.md
+        else
+          echo "⚠️ 源仓库中没有找到 README.md"
         fi
+        
+        # 显示同步状态
+        echo "📊 同步状态:"
+        echo "  - docs/ 目录存在: $([ -d docs ] && echo "是" || echo "否")"
+        echo "  - README.md 存在: $([ -f README.md ] && echo "是" || echo "否")"
         
         # 清理临时目录
         rm -rf "$TEMP_DIR"
@@ -60,23 +70,41 @@ jobs:
     
     - name: 检查并提交变更
       run: |
+        echo "🔍 检查文件变更状态..."
+        
+        # 显示当前 Git 状态
+        echo "📊 Git 状态:"
+        git status --short
+        
         # 检查是否有变更
-        if git diff --quiet; then
-          echo "ℹ️ 没有检测到文件变更"
+        if git diff --quiet && git diff --cached --quiet; then
+          echo "ℹ️ 没有检测到文件变更，跳过提交"
           exit 0
         fi
         
+        echo "📝 检测到文件变更，准备提交..."
+        
+        # 显示具体变更
+        echo "📋 变更详情:"
+        git diff --name-status
+        
         # 添加变更文件
         git add docs/ README.md
+        
+        # 检查暂存区状态
+        echo "📦 暂存区状态:"
+        git status --short
         
         # 生成提交信息
         TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
         COMMIT_MSG="🔄 自动同步周刊内容 - $TIMESTAMP"
         
         # 提交变更
+        echo "💾 提交变更..."
         git commit -m "$COMMIT_MSG"
         
         # 推送到远程仓库
+        echo "🚀 推送到远程仓库..."
         git push origin ${{ env.TARGET_BRANCH }}
         
-        echo "✅ 变更已提交并推送"
+        echo "✅ 变更已提交并推送到 ${{ env.TARGET_BRANCH }} 分支"
