@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation'
 import { getIssueByNumber } from '@/lib/data'
 import { MarkdownRenderer } from '@/components/markdown-renderer'
-import { SummaryRenderer } from '@/components/summary-renderer'
 import { TOC } from '@/components/toc'
 import Link from 'next/link'
 

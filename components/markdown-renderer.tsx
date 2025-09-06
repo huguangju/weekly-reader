@@ -6,6 +6,7 @@ import rehypeHighlight from 'rehype-highlight'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import rehypeSlug from 'rehype-slug'
 import { scrollToElement, handleAnchorClick } from '@/lib/scroll'
+import { LinkPreview } from './link-preview'
 
 interface MarkdownRendererProps {
   content: string
@@ -117,33 +118,15 @@ export function MarkdownRenderer({ content, optimizedTitle, className = '' }: Ma
               )
             }
             
-            // 判断是否为外部链接
-            const isExternal = href?.startsWith('http') || href?.startsWith('//')
-            
-            // 外部链接
-            if (isExternal) {
-              return (
-                <a
-                  href={href}
-                  className={`link link-external ${className || ''}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  {...props}
-                >
-                  {children}
-                </a>
-              )
-            }
-            
-            // 内部链接
+            // 使用 LinkPreview 组件处理所有链接
             return (
-              <a
-                href={href}
-                className={`link link-primary ${className || ''}`}
+              <LinkPreview
+                href={href || ''}
+                className={`link ${href?.startsWith('http') || href?.startsWith('//') ? 'link-external' : 'link-primary'} ${className || ''}`}
                 {...props}
               >
                 {children}
-              </a>
+              </LinkPreview>
             )
           },
           // 自定义代码块组件
