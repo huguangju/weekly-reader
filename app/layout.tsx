@@ -23,12 +23,12 @@ export default function RootLayout({
         {/* 预加载字体文件 */}
         <link 
           rel="preload" 
-          href="https://chinese-fonts-cdn.deno.dev/packages/lxgwwenkai/dist/lxgwwenkai-light/result.css" 
+          href="https://chinese-fonts-cdn.deno.dev/packages/lxgwwenkai/dist/LXGWWenKai-Regular/result.css" 
           as="style"
         />
         <link 
           rel="stylesheet" 
-          href="https://chinese-fonts-cdn.deno.dev/packages/lxgwwenkai/dist/lxgwwenkai-light/result.css" 
+          href="https://chinese-fonts-cdn.deno.dev/packages/lxgwwenkai/dist/LXGWWenKai-Regular/result.css" 
         />
       </head>
       <body className="antialiased font-wenkai">

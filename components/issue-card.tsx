@@ -48,10 +48,10 @@ export function IssueCard({ issue, className = '' }: IssueCardProps) {
             
             {/* 描述 */}
             <div className="flex-1 min-w-0">
-              <div className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+              <div className="text-gray-600 dark:text-gray-300 leading-relaxed">
                 <SummaryRenderer 
                   content={issue.description} 
-                  className="text-sm line-clamp-4"
+                  className="line-clamp-4"
                   maxLength={200}
                 />
               </div>

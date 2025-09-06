@@ -65,7 +65,7 @@ export default async function IssuePage({ params }: IssuePageProps) {
           {/* 主要内容 */}
           <div className="lg:col-span-3">
             {/* 期刊内容 */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 text-lg">
               <MarkdownRenderer content={issue.content} optimizedTitle={issue.optimizedTitle} />
             </div>
           </div>
