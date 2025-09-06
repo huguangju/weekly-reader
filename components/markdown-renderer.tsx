@@ -104,7 +104,7 @@ export function MarkdownRenderer({ content, optimizedTitle, className = '' }: Ma
               return (
                 <a
                   href={href}
-                  className={`group relative inline-block ${className || ''}`}
+                  className={`link link-anchor ${className || ''}`}
                   onClick={(e) => {
                     e.preventDefault()
                     const id = href.slice(1)
@@ -113,20 +113,33 @@ export function MarkdownRenderer({ content, optimizedTitle, className = '' }: Ma
                   {...props}
                 >
                   {children}
-                  <span className="absolute -left-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
-                    #
-                  </span>
                 </a>
               )
             }
             
-            // 普通链接
+            // 判断是否为外部链接
+            const isExternal = href?.startsWith('http') || href?.startsWith('//')
+            
+            // 外部链接
+            if (isExternal) {
+              return (
+                <a
+                  href={href}
+                  className={`link link-external ${className || ''}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  {...props}
+                >
+                  {children}
+                </a>
+              )
+            }
+            
+            // 内部链接
             return (
               <a
                 href={href}
-                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline decoration-2 underline-offset-2 transition-colors duration-200"
-                target="_blank"
-                rel="noopener noreferrer"
+                className={`link link-primary ${className || ''}`}
                 {...props}
               >
                 {children}
