@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { scrollToElement, updateUrlAnchor } from '@/lib/scroll'
 
 interface HeadingItem {
   id: string
@@ -15,6 +17,7 @@ interface TOCProps {
 export function TOC({ className = '' }: TOCProps) {
   const [headings, setHeadings] = useState<HeadingItem[]>([])
   const [activeHeading, setActiveHeading] = useState<string | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
     // TOC 不显示一级标题，仅收集 h2-h6
@@ -27,7 +30,12 @@ export function TOC({ className = '' }: TOCProps) {
       const level = parseInt(element.tagName.charAt(1))
 
       if (id && text) {
-        headingList.push({ id, text, level })
+        // 过滤掉文本中的 # 符号和多余空白，只保留标题文本
+        const cleanText = text
+          .replace(/#+\s*/g, '') // 移除所有 # 符号和后面的空格
+          .replace(/\s+/g, ' ') // 将多个连续空格替换为单个空格
+          .trim() // 移除首尾空白
+        headingList.push({ id, text: cleanText, level })
       }
     })
 
@@ -38,20 +46,27 @@ export function TOC({ className = '' }: TOCProps) {
     if (headings.length === 0) return
 
     const handleScroll = () => {
-      const scrollTop = window.scrollY + 100 // 偏移量
+      const scrollTop = window.scrollY + 80 // 与滚动偏移量保持一致
       let currentHeading = null
 
+      // 从后往前遍历，找到第一个在可视区域内的标题
       for (let i = headings.length - 1; i >= 0; i--) {
         const heading = headings[i]
         const element = document.getElementById(heading.id)
         
-        if (element && scrollTop >= element.offsetTop) {
-          currentHeading = heading.id
-          break
+        if (element) {
+          // 如果标题的顶部位置小于等于当前滚动位置，说明这个标题已经进入可视区域
+          if (element.offsetTop <= scrollTop) {
+            currentHeading = heading.id
+            break
+          }
         }
       }
 
-      setActiveHeading(currentHeading)
+      // 如果找到了当前标题，更新高亮状态
+      if (currentHeading !== activeHeading) {
+        setActiveHeading(currentHeading)
+      }
     }
 
     window.addEventListener('scroll', handleScroll)
@@ -61,10 +76,13 @@ export function TOC({ className = '' }: TOCProps) {
   }, [headings])
 
   const scrollToHeading = (headingId: string) => {
-    const element = document.getElementById(headingId)
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }
+    // 滚动到目标元素
+    scrollToElement(headingId)
+    
+    // 延迟更新 URL，避免影响滚动
+    setTimeout(() => {
+      updateUrlAnchor(headingId)
+    }, 100)
   }
 
   if (headings.length === 0) {
