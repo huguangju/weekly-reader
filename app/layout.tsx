@@ -3,6 +3,8 @@ import './globals.css'
 import { SearchBar } from '@/components/search-bar'
 import { MobileMenu } from '@/components/mobile-menu'
 import { GitHubDropdown } from '@/components/github-dropdown'
+import { ThemeProvider } from '@/components/theme-provider'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 export const metadata: Metadata = {
   title: '科技爱好者周刊 - 更好的阅读体验',
@@ -15,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="zh-CN">
+    <html lang="zh-CN" suppressHydrationWarning>
       <head>
         {/* 预连接字体CDN  */}
         <link rel="preconnect" href="https://chinese-fonts-cdn.deno.dev" />
@@ -33,63 +35,73 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased font-wenkai">
-        {/* 导航栏 */}
-        <nav className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16">
-              {/* Logo */}
-              <div className="flex items-center">
-                <a href="/" className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                  科技爱好者周刊
-                </a>
-              </div>
-              
-              {/* 导航链接 */}
-              <div className="hidden md:flex items-center space-x-8">
-                <a 
-                  href="/" 
-                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200"
-                >
-                  首页
-                </a>
-                <a 
-                  href="/issues" 
-                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200"
-                >
-                  所有期刊
-                </a>
-                {/* GitHub 下拉菜单 */}
-                <GitHubDropdown />
-              </div>
-              
-              {/* 搜索框 */}
-              <div className="hidden md:flex items-center">
-                <SearchBar />
-              </div>
-              
-              {/* 移动端菜单 */}
-              <div className="md:hidden">
-                <MobileMenu />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          enableColorScheme
+        >
+          {/* 导航栏 */}
+          <nav className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex justify-between items-center h-16">
+                {/* Logo */}
+                <div className="flex items-center">
+                  <a href="/" className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                    科技爱好者周刊
+                  </a>
+                </div>
+                
+                {/* 导航链接 */}
+                <div className="hidden md:flex items-center space-x-8">
+                  <a 
+                    href="/" 
+                    className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200"
+                  >
+                    首页
+                  </a>
+                  <a 
+                    href="/issues" 
+                    className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200"
+                  >
+                    所有期刊
+                  </a>
+                  {/* GitHub 下拉菜单 */}
+                  <GitHubDropdown />
+                </div>
+                
+                {/* 右侧操作区 */}
+                <div className="hidden md:flex items-center space-x-4">
+                  {/* 主题切换按钮 */}
+                  <ThemeToggle />
+                  {/* 搜索框 */}
+                  <SearchBar />
+                </div>
+                
+                {/* 移动端菜单 */}
+                <div className="md:hidden">
+                  <MobileMenu />
+                </div>
               </div>
             </div>
-          </div>
-        </nav>
+          </nav>
 
-        {/* 主要内容 */}
-        <main>
-          {children}
-        </main>
+          {/* 主要内容 */}
+          <main>
+            {children}
+          </main>
 
-        {/* 页脚 */}
-        <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="text-center text-gray-600 dark:text-gray-400">
-              <p className="text-sm">
-                提供更友好的阅读界面和分类浏览体验
-              </p>
+          {/* 页脚 */}
+          <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-16">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              <div className="text-center text-gray-600 dark:text-gray-400">
+                <p className="text-sm">
+                  提供更友好的阅读界面和分类浏览体验
+                </p>
+              </div>
             </div>
-          </div>
-        </footer>
+          </footer>
+        </ThemeProvider>
       </body>
     </html>
   )

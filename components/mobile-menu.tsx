@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { Search, X, Menu, Github, ExternalLink } from 'lucide-react'
 import { SearchModal } from './search-modal'
+import { ThemeToggle } from './theme-toggle'
 
 export function MobileMenu() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -43,12 +44,15 @@ export function MobileMenu() {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
             菜单
           </h2>
-          <button
-            onClick={closeMenu}
-            className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-          >
-            <X className="h-6 w-6" />
-          </button>
+          <div className="flex items-center space-x-2">
+            <ThemeToggle />
+            <button
+              onClick={closeMenu}
+              className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+            >
+              <X className="h-6 w-6" />
+            </button>
+          </div>
         </div>
 
         {/* 菜单内容 */}
