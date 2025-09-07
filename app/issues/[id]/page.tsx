@@ -1,7 +1,9 @@
 import { notFound } from 'next/navigation'
-import { getIssueByNumber } from '@/lib/data'
+import { getIssueByNumber, getAdjacentIssues } from '@/lib/data'
 import { MarkdownRenderer } from '@/components/markdown-renderer'
 import { TOC } from '@/components/toc'
+import { IssueNavigation, MobileIssueNavigation } from '@/components/issue-navigation'
+import { MiniIssueNavigation } from '@/components/mini-issue-navigation'
 import Link from 'next/link'
 
 interface IssuePageProps {
@@ -24,6 +26,9 @@ export default async function IssuePage({ params }: IssuePageProps) {
     notFound()
   }
 
+  // 获取相邻期刊
+  const { previous, next } = await getAdjacentIssues(issueNumber)
+
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('zh-CN', {
       year: 'numeric',
@@ -36,7 +41,7 @@ export default async function IssuePage({ params }: IssuePageProps) {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* 面包屑导航 */}
-        <nav className="mb-8">
+        <nav className="mb-8 flex items-center justify-between">
           <ol className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
             <li>
               <Link href="/" className="hover:text-gray-900 dark:hover:text-gray-100">
@@ -58,14 +63,31 @@ export default async function IssuePage({ params }: IssuePageProps) {
               第 {issue.issueNumber} 期
             </li>
           </ol>
+          
+          {/* 迷你导航 */}
+          <MiniIssueNavigation 
+            previous={previous} 
+            next={next} 
+            className=""
+          />
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* 主要内容 */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-3 space-y-6">
             {/* 期刊内容 */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 text-lg">
               <MarkdownRenderer content={issue.content} optimizedTitle={issue.optimizedTitle} />
+            </div>
+
+            {/* 桌面端导航 */}
+            <div className="hidden sm:block">
+              <IssueNavigation previous={previous} next={next} />
+            </div>
+
+            {/* 移动端导航 */}
+            <div className="sm:hidden">
+              <MobileIssueNavigation previous={previous} next={next} />
             </div>
           </div>
 

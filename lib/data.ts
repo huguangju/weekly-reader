@@ -106,3 +106,31 @@ export async function searchIssues(query: string): Promise<Issue[]> {
     return []
   }
 }
+
+/**
+ * 获取相邻期刊（上一期和下一期）
+ */
+export async function getAdjacentIssues(issueNumber: number): Promise<{
+  previous: Issue | null
+  next: Issue | null
+}> {
+  try {
+    const issues = await getAllIssues()
+    // 按期数排序
+    const sortedIssues = issues.sort((a, b) => a.issueNumber - b.issueNumber)
+    
+    const currentIndex = sortedIssues.findIndex(issue => issue.issueNumber === issueNumber)
+    
+    if (currentIndex === -1) {
+      return { previous: null, next: null }
+    }
+    
+    return {
+      previous: currentIndex > 0 ? sortedIssues[currentIndex - 1] : null,
+      next: currentIndex < sortedIssues.length - 1 ? sortedIssues[currentIndex + 1] : null
+    }
+  } catch (error) {
+    console.error('获取相邻期刊失败:', error)
+    return { previous: null, next: null }
+  }
+}

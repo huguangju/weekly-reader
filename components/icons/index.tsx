@@ -18,11 +18,14 @@ import {
   Sun,
   Check,
   ChevronRight,
+  ChevronLeft,
   Circle,
   Tag,
   Calendar,
   ArrowUp,
   ArrowDown,
+  ArrowLeft,
+  ArrowRight,
   CornerDownLeft,
   type LucideIcon
 } from 'lucide-react'
@@ -125,6 +128,10 @@ export const ChevronRightIcon = (props: IconProps) => (
   <BaseIcon icon={ChevronRight} {...props} />
 )
 
+export const ChevronLeftIcon = (props: IconProps) => (
+  <BaseIcon icon={ChevronLeft} {...props} />
+)
+
 export const CircleIcon = (props: IconProps) => (
   <BaseIcon icon={Circle} {...props} />
 )
@@ -145,6 +152,14 @@ export const ArrowUpIcon = (props: IconProps) => (
 
 export const ArrowDownIcon = (props: IconProps) => (
   <BaseIcon icon={ArrowDown} {...props} />
+)
+
+export const ArrowLeftIcon = (props: IconProps) => (
+  <BaseIcon icon={ArrowLeft} {...props} />
+)
+
+export const ArrowRightIcon = (props: IconProps) => (
+  <BaseIcon icon={ArrowRight} {...props} />
 )
 
 export const CornerDownLeftIcon = (props: IconProps) => (
