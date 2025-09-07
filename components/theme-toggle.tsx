@@ -4,13 +4,19 @@ import * as React from 'react'
 import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 
-export function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme()
+export const ThemeToggle = React.memo(function ThemeToggle() {
+  const { setTheme, resolvedTheme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
 
   React.useEffect(() => {
     setMounted(true)
   }, [])
+
+  const isDark = resolvedTheme === 'dark'
+
+  const handleToggle = React.useCallback(() => {
+    setTheme(isDark ? 'light' : 'dark')
+  }, [isDark, setTheme])
 
   if (!mounted) {
     return (
@@ -20,12 +26,6 @@ export function ThemeToggle() {
         </div>
       </div>
     )
-  }
-
-  const isDark = resolvedTheme === 'dark'
-
-  const handleToggle = () => {
-    setTheme(isDark ? 'light' : 'dark')
   }
 
   return (
@@ -50,4 +50,4 @@ export function ThemeToggle() {
       </span>
     </button>
   )
-}
+})

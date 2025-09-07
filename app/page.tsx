@@ -1,7 +1,7 @@
 import { getTimeIndex, getAllIssues } from '@/lib/data'
-import { IssueCard } from '@/components/issue-card'
 import { FloatingNav } from '@/components/floating-nav'
 import { MobileNav } from '@/components/mobile-nav'
+import { SimpleIssueList } from '@/components/simple-issue-list'
 
 import { Issue } from '@/types'
 
@@ -34,56 +34,11 @@ export default async function HomePage() {
           </p>
         </div>
 
-        {/* 期刊列表 */}
-        <div className="space-y-12">
-          {timeIndex.map((yearData) => (
-            <div key={yearData.year} className="space-y-6">
-              {/* 年份标题 */}
-              <div 
-                data-year={yearData.year}
-                className="border-b border-gray-200 dark:border-gray-700 pb-2"
-              >
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                  {yearData.year}
-                </h2>
-              </div>
-
-              {/* 月份分组 */}
-              {yearData.months.map((monthData) => (
-                <div 
-                  key={`${yearData.year}-${monthData.month}`} 
-                  data-month={`${yearData.year}-${monthData.month}`}
-                  className="space-y-4"
-                >
-                  {/* 月份标题 */}
-                  <div className="flex items-center space-x-3">
-                    <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                      {monthData.month}
-                    </h3>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {monthData.issues.length} 期
-                    </span>
-                  </div>
-
-                  {/* 期刊网格 */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {monthData.issues.map((issueIndex) => {
-                      const issue = issueMap.get(issueIndex.number)
-                      if (!issue) return null
-                      
-                      return (
-                        <IssueCard
-                          key={issue.id}
-                          issue={issue}
-                        />
-                      )
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
+        {/* 期刊列表 - 使用图片懒加载优化 */}
+        <SimpleIssueList 
+          timeIndex={timeIndex} 
+          allIssues={allIssues}
+        />
 
         {/* 统计信息 */}
         <div className="mt-16 text-center">

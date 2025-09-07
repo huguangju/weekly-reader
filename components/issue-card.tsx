@@ -3,13 +3,15 @@
 import { Issue } from '@/types'
 import Link from 'next/link'
 import { SummaryRenderer } from './summary-renderer'
+import { LazyImage } from './lazy-image'
+import { memo } from 'react'
 
 interface IssueCardProps {
   issue: Issue
   className?: string
 }
 
-export function IssueCard({ issue, className = '' }: IssueCardProps) {
+export const IssueCard = memo(function IssueCard({ issue, className = '' }: IssueCardProps) {
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('zh-CN', {
       year: 'numeric',
@@ -38,7 +40,7 @@ export function IssueCard({ issue, className = '' }: IssueCardProps) {
             {/* 封面图 */}
             {issue.coverImage && (
               <div className="flex-shrink-0">
-                <img 
+                <LazyImage 
                   src={issue.coverImage} 
                   alt={`第 ${issue.issueNumber} 期封面图`}
                   className="w-24 h-24 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
@@ -79,4 +81,4 @@ export function IssueCard({ issue, className = '' }: IssueCardProps) {
       </div>
     </Link>
   )
-}
+})

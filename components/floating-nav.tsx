@@ -49,7 +49,7 @@ export function FloatingNav({ timeIndex }: FloatingNavProps) {
 
       sections.forEach((section) => {
         const rect = section.getBoundingClientRect()
-        const offset = isMobile ? 80 : 120 // 移动端偏移量更小
+        const offset = isMobile ? 80 : 120
 
         if (rect.top <= offset && rect.bottom > offset) {
           if (section.hasAttribute('data-year')) {
