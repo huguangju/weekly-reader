@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Search, X, Menu } from 'lucide-react'
+import { Search, X, Menu, Github, ExternalLink } from 'lucide-react'
 import { SearchModal } from './search-modal'
 
 export function MobileMenu() {
@@ -78,6 +78,41 @@ export function MobileMenu() {
             >
               所有期刊
             </a>
+          </div>
+
+          {/* GitHub 仓库链接 */}
+          <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">相关仓库</h3>
+            <div className="space-y-2">
+              <a 
+                href="https://github.com/ruanyf/weekly" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                onClick={closeMenu}
+              >
+                <div className="flex items-center space-x-2">
+                  <Github className="w-4 h-4" />
+                  <span>数据来源</span>
+                  <ExternalLink className="w-3 h-3 ml-auto" />
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-6">ruanyf/weekly</div>
+              </a>
+              <a 
+                href="https://github.com/huguangju/weekly-reader" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                onClick={closeMenu}
+              >
+                <div className="flex items-center space-x-2">
+                  <Github className="w-4 h-4" />
+                  <span>当前站点</span>
+                  <ExternalLink className="w-3 h-3 ml-auto" />
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-6">huguangju/weekly-reader</div>
+              </a>
+            </div>
           </div>
         </div>
       </div>

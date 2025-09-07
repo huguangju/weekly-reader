@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { SearchBar } from '@/components/search-bar'
 import { MobileMenu } from '@/components/mobile-menu'
+import { GitHubDropdown } from '@/components/github-dropdown'
 
 export const metadata: Metadata = {
   title: '科技爱好者周刊 - 更好的阅读体验',
@@ -57,6 +58,8 @@ export default function RootLayout({
                 >
                   所有期刊
                 </a>
+                {/* GitHub 下拉菜单 */}
+                <GitHubDropdown />
               </div>
               
               {/* 搜索框 */}
@@ -82,17 +85,6 @@ export default function RootLayout({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="text-center text-gray-600 dark:text-gray-400">
               <p className="text-sm">
-                数据来源：{' '}
-                <a 
-                  href="https://github.com/ruanyf/weekly" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-blue-600 dark:text-blue-400 hover:underline"
-                >
-                  ruanyf/weekly
-                </a>
-              </p>
-              <p className="text-sm mt-2">
                 提供更友好的阅读界面和分类浏览体验
               </p>
             </div>
