@@ -55,24 +55,24 @@ export function LazyImage({
   }
 
   return (
-    <div ref={imgRef} className={`relative overflow-hidden ${className}`}>
+    <span ref={imgRef} className={`relative inline-block overflow-hidden ${className}`}>
       {/* 占位符 */}
       {!isLoaded && !hasError && (
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
+        <span className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
           {/* 骨架屏效果 */}
-          <div className="relative w-full h-full">
+          <span className="relative w-full h-full">
             {/* 背景动画 */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent dark:via-white/10 animate-pulse"></div>
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent dark:via-white/10 animate-pulse"></span>
             
             {/* 加载指示器和文字整体居中 */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-gray-300 dark:border-gray-600 border-t-transparent rounded-full animate-spin mb-2"></div>
+            <span className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-gray-300 dark:border-gray-600 border-t-transparent rounded-full animate-spin mb-2"></span>
               <span className="text-xs text-gray-400 dark:text-gray-500 font-medium whitespace-nowrap hidden sm:block">
                 加载中...
               </span>
-            </div>
-          </div>
-        </div>
+            </span>
+          </span>
+        </span>
       )}
       
       {/* 实际图片 */}
@@ -93,12 +93,12 @@ export function LazyImage({
       
       {/* 错误状态 */}
       {hasError && (
-        <div className="absolute inset-0 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-          <div className=" text-gray-400 dark:text-gray-500">
+        <span className="absolute inset-0 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+          <span className=" text-gray-400 dark:text-gray-500">
             <DamageMapIcon className="w-8 h-8 sm:w-10 sm:h-10" />
-          </div>
-        </div>
+          </span>
+        </span>
       )}
-    </div>
+    </span>
   )
 }
