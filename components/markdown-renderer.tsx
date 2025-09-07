@@ -7,6 +7,7 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import rehypeSlug from 'rehype-slug'
 import { scrollToElement, handleAnchorClick } from '@/lib/scroll'
 import { LinkPreview } from './link-preview'
+import { LazyImage } from './lazy-image'
 
 interface MarkdownRendererProps {
   content: string
@@ -175,15 +176,20 @@ export function MarkdownRenderer({ content, optimizedTitle, className = '' }: Ma
             </blockquote>
           ),
           // 自定义图片组件
-          img: ({ src, alt, ...props }) => (
-            <img
-              src={src}
-              alt={alt}
-              className="max-w-full h-auto rounded-lg shadow-sm mb-4"
-              loading="lazy"
-              {...props}
-            />
-          )
+          img: ({ src, alt, ...props }) => {
+            if (!src || typeof src !== 'string') {
+              return null
+            }
+            
+            return (
+              <LazyImage
+                src={src}
+                alt={alt || ''}
+                className="max-w-full h-auto rounded-lg shadow-sm mb-4"
+                {...props}
+              />
+            )
+          }
         }}
       >
         {content}

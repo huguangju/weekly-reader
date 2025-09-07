@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { DamageMapIcon } from '@/components/icons'
 
 interface LazyImageProps {
   src: string
   alt: string
   className?: string
-  onError?: () => void
-  onLoad?: () => void
+  onError?: (event: React.SyntheticEvent<HTMLImageElement, Event>) => void
+  onLoad?: (event: React.SyntheticEvent<HTMLImageElement, Event>) => void
 }
 
 export function LazyImage({ 
@@ -43,14 +44,14 @@ export function LazyImage({
     return () => observer.disconnect()
   }, [])
 
-  const handleLoad = () => {
+  const handleLoad = (event: React.SyntheticEvent<HTMLImageElement, Event>) => {
     setIsLoaded(true)
-    onLoad?.()
+    onLoad?.(event)
   }
 
-  const handleError = () => {
+  const handleError = (event: React.SyntheticEvent<HTMLImageElement, Event>) => {
     setHasError(true)
-    onError?.()
+    onError?.(event)
   }
 
   return (
@@ -93,12 +94,8 @@ export function LazyImage({
       {/* 错误状态 */}
       {hasError && (
         <div className="absolute inset-0 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400 dark:text-gray-500">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M21 5v6.59l-3-3.01-4 4.01-4-4-4 4-3-3.01V5c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2zm-3 6.42l3 3.01V19c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2v-6.58l3 2.99 4-4 4 4 4-3.99z"/>
-              <path d="M12 9.5l-2 2-1.5-1.5L12 6.5l3.5 3.5-1.5 1.5-2-2z" opacity="0.3"/>
-              <path d="M8 12l2-2 1.5 1.5L12 13l-1.5-1.5L8 12z" opacity="0.3"/>
-            </svg>
+          <div className=" text-gray-400 dark:text-gray-500">
+            <DamageMapIcon className="w-8 h-8 sm:w-10 sm:h-10" />
           </div>
         </div>
       )}
