@@ -112,9 +112,13 @@ jobs:
         echo "💾 提交变更..."
         git commit -m "$COMMIT_MSG"
         
+        # 拉取最新变更以避免冲突
+        echo "🔄 拉取最新变更..."
+        git pull --rebase origin ${{ env.TARGET_BRANCH }}
+
         # 推送到远程仓库
         echo "🚀 推送到远程仓库..."
-        git push origin ${{ env.TARGET_BRANCH }}
+        git push --force origin ${{ env.TARGET_BRANCH }}
         
         echo "✅ 变更已提交并推送到 ${{ env.TARGET_BRANCH }} 分支"
 
