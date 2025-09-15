@@ -15,8 +15,6 @@ jobs:
   sync-content:
     name: 同步周刊内容
     runs-on: ubuntu-latest
-    outputs:
-      has-changes: ${{ steps.check-changes.outputs.has-changes }}
     
     steps:
     - name: 检出当前仓库
@@ -121,53 +119,3 @@ jobs:
         git push --force origin ${{ env.TARGET_BRANCH }}
         
         echo "✅ 变更已提交并推送到 ${{ env.TARGET_BRANCH }} 分支"
-
-  deploy-to-vercel:
-    name: 部署到 Vercel
-    runs-on: ubuntu-latest
-    needs: sync-content
-    if: needs.sync-content.outputs.has-changes == 'true'
-    
-    steps:
-    - name: 检出代码
-      uses: actions/checkout@v4
-    
-    - name: 设置 Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-
-    - name: 安装 pnpm
-      uses: pnpm/action-setup@v4
-      with:
-        version: 8
-        run_install: false
-    
-    - name: 安装依赖
-      run: pnpm install --frozen-lockfile
-    
-    - name: 构建项目
-      run: pnpm run build
-      env:
-        NODE_ENV: production
-    
-    - name: 部署到 Vercel
-      uses: amondnet/vercel-action@v25
-      with:
-        vercel-token: ${{ secrets.VERCEL_TOKEN }}
-        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-        vercel-args: '--prod'
-        working-directory: ./
-    
-    - name: 部署成功通知
-      if: success()
-      run: |
-        echo "🎉 部署成功！"
-        echo "网站已更新到最新内容"
-    
-    - name: 部署失败通知
-      if: failure()
-      run: |
-        echo "❌ 部署失败！"
-        echo "请检查 Vercel 配置和日志"
